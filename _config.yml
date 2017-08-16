@@ -1,7 +1,7 @@
 # Build settings
 markdown: kramdown
 highlighter: pygments
-plugins: [jekyll-paginate, jekyll-paginate-multiple]
+plugins: [jekyll-paginate, jekyll-paginate-multiple, bourbon]
 
 paginate_multiple:
   - paginate: 5
