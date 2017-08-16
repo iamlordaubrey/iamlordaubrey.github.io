@@ -2,7 +2,7 @@
 permalink: /blog/:year/:title/
 markdown: kramdown
 highlighter: pygments
-gems: [jekyll-paginate]
+plugins: [jekyll-paginate]
 
 paginate: 3
 paginate_path: "/blog/page/:num/"
@@ -15,29 +15,29 @@ sass:
   style: compressed # expanded
 
 # SEO settings
-title: end2end
-description: "A free Jekyll theme for download"
-keywords: "Jekyll, theme, free, download, SEO, blog, web"
-url: http://nandomoreira.me
-baseurl: "/end2end"
+title: iamlordaubrey
+description: "Spilling my guts; Letting 'em out!"
+keywords: "Jekyll, SEO, blog, web, programming, developer, software"
+url: https://iamlordaubrey.github.io
+baseurl: ""
 
-google_analytics: UA-52446115-1
-repo: http://github.com/nandomoreirame/end2end
-disqus_shortname: "nandothemes"
-disqus_site_shortname: "nandothemes"
+google_analytics: UA-00000000-0
+repo: https://github.com/iamlordaubrey/
+disqus_shortname: "aaaaaaaaaaa"
+disqus_site_shortname: "aaaaaaaaaaa"
 
 # Author settings
 author:
-  name: Fernando Moreira
-  job: Frontend Engineer
-  bio: "Enthusiast performance, responsive design and usability, always looking for the best project and good coffee."
+  name: Chiemeka Alim
+  job: Software Developer
+  bio: "Geek-in-the-making, realistic dreamer, student of Hogwarts, Jedi knight, star gazer and believer in other forms of life."
   thumb: /images/author.jpg
-  email: nandomoreira.me@gmail.com
-  url: https://nandomoreira.me/
-  github: https://github.com/nandomoreirame
-  twitter: https://twitter.com/umdevux
-  facebook: https://facebook.com/umdevux
-  linkedin: https://linkedin.com/in/nandomoreirame
+  email: lord.chiemy@gmail.com
+  url: https://iamlordaubrey.github.io
+  github: https://github.com/iamlordaubrey
+  twitter: https://twitter.com/iamlordaubrey
+  facebook: https://facebook.com/iamlordaubrey
+  linkedin: https://www.linkedin.com/in/chiemekaalim/
 
 # navbar pages
 navbar:
