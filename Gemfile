@@ -23,6 +23,7 @@ group :jekyll_plugins do
   gem "bourbon", "~>4.3"
   gem "jekyll-feed", "~>0.6"
   gem "jekyll-paginate"
+  gem "jekyll-paginate-multiple"
   gem "pygments.rb"
   gem "jekyll-compose"
   gem "kramdown"

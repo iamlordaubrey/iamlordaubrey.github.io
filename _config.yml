@@ -1,11 +1,19 @@
 # Build settings
-permalink: /blog/:year/:title/
+# permalink: /blog/:year/:title/
 markdown: kramdown
 highlighter: pygments
-plugins: [jekyll-paginate]
+plugins: [jekyll-paginate, jekyll-paginate-multiple]
 
-paginate: 3
-paginate_path: "/blog/page/:num/"
+# paginate: 5
+# paginate_path: "/blog/page/:num/"
+paginate_multiple:
+  - paginate: 2
+    paginate_path: '/musings/page/:num/'
+    sub_dir: '/musings'
+  - paginate: 2
+    paginate_path: '/techie/page/:num'
+    sub_dir: '/techie'
+
 comments: true
 
 source: source
@@ -15,7 +23,7 @@ sass:
   style: compressed # expanded
 
 # SEO settings
-title: iamlordaubrey
+title: Aubrey's Arena
 description: "Spilling my guts; Letting 'em out!"
 keywords: "Jekyll, SEO, blog, web, programming, developer, software"
 url: https://iamlordaubrey.github.io
@@ -23,8 +31,8 @@ baseurl: ""
 
 google_analytics: UA-00000000-0
 repo: https://github.com/iamlordaubrey/
-disqus_shortname: "aaaaaaaaaaa"
-disqus_site_shortname: "aaaaaaaaaaa"
+disqus_shortname: "aubreys-arena"
+disqus_site_shortname: "aubreys-arena"
 
 # Author settings
 author:
@@ -43,9 +51,9 @@ author:
 navbar:
   - slug: about
     title: About
-  - slug: icons
-    title: Icons
-  - slug: blog
-    title: Blog
+  - slug: musings
+    title: Musings
+  - slug: techie
+    title: Techie
 
 exclude: ["config.rb", "src", "Gemfile", "Gemfile.lock", "package.json","README.md", "Rakefile"]

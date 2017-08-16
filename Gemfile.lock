@@ -25,6 +25,9 @@ GEM
     jekyll-feed (0.9.2)
       jekyll (~> 3.3)
     jekyll-paginate (1.1.0)
+    jekyll-paginate-multiple (0.1.0)
+      jekyll (>= 2.5)
+      jekyll-paginate (~> 1.1)
     jekyll-sass-converter (1.5.0)
       sass (~> 3.4)
     jekyll-watch (1.5.0)
@@ -64,6 +67,7 @@ DEPENDENCIES
   jekyll-compose
   jekyll-feed (~> 0.6)
   jekyll-paginate
+  jekyll-paginate-multiple
   json (~> 2)
   kramdown
   pygments.rb
