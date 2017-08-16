@@ -1,16 +1,13 @@
 # Build settings
-# permalink: /blog/:year/:title/
 markdown: kramdown
 highlighter: pygments
 plugins: [jekyll-paginate, jekyll-paginate-multiple]
 
-# paginate: 5
-# paginate_path: "/blog/page/:num/"
 paginate_multiple:
-  - paginate: 2
+  - paginate: 5
     paginate_path: '/musings/page/:num/'
     sub_dir: '/musings'
-  - paginate: 2
+  - paginate: 5
     paginate_path: '/techie/page/:num'
     sub_dir: '/techie'
 

@@ -1,9 +1,6 @@
 {% if paginator.total_pages > 1 %}
 <nav class="pagination" role="pagination">
-  <ul>
-    
-    {% assign url = site.baseurl | append: "/blog/" %}
-        
+  <ul>        
     {% if paginator.previous_page %}
       {% if paginator.previous_page > 1 %}
         {% assign prev = 'page/' | append: paginator.previous_page %}
@@ -18,22 +15,6 @@
     {% else %}
       <li><span class="next button button-ghost disabled">Next &raquo;</span></li>
     {% endif %}
-
-
-    <!-- <div class="pagination">
-      {% if paginator.previous_page %}
-        <a href="{{ paginator.previous_page_path }}" class="previous">Previous</a>
-      {% else %}
-        <span class="previous">Previous</span>
-      {% endif %}
-      <span class="page_number ">Page: {{ paginator.page }} of {{ paginator.total_pages }}</span>
-      {% if paginator.next_page %}
-        <a href="{{ paginator.next_page_path }}" class="next">Next</a>
-      {% else %}
-        <span class="next ">Next</span>
-      {% endif %}
-    </div> -->
-
   </ul>
 </nav>
 {% endif %}

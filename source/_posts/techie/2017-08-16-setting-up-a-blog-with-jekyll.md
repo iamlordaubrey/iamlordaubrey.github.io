@@ -1,12 +1,13 @@
 ---
 layout: post
 title:  "Blogging with Jekyll!"
-date: 2017-03-06 08:49:01
-categories: jekyll github-pages
+date: 2017-08-16 13:09:01
+categories: techie
 keywords: "blogging, jekyll, github-pages"
 image: https://talk.jekyllrb.com/uploads/jekyllrb/original/1X/4f9bd5334246d33651e846aed812280fbff586ba.png
 comments: true
 ---
+
 
 ### Setting up a blog on GitHub Pages with Jekyll
 
