@@ -6,7 +6,7 @@ require "jekyll"
 
 # Change your GitHub reponame
 GITHUB_REPONAME = "iamlordaubrey/iamlordaubrey.github.io"
-GITHUB_REPO_BRANCH = "master"
+GITHUB_REPO_BRANCH = "pre-master"
 
 SOURCE = "source/"
 DEST = "_site"
