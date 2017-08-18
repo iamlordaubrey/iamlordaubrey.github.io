@@ -8,9 +8,6 @@ image: https://talk.jekyllrb.com/uploads/jekyllrb/original/1X/4f9bd5334246d33651
 comments: true
 ---
 
-
-### Setting up a blog on GitHub Pages with Jekyll
-
 I just finished setting up my blog. It's still very much green, as am I, still I decided to begin my ramblings.
 
 <br>
