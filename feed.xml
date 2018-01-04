@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Aubrey's Arena</title>
+    <description>Spilling my guts; Letting 'em out!</description>
+    <link>https://iamlordaubrey.github.io/</link>
+    <atom:link href="https://iamlordaubrey.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 04 Jan 2018 16:47:42 +0100</pubDate>
+    <lastBuildDate>Thu, 04 Jan 2018 16:47:42 +0100</lastBuildDate>
+    <generator>Jekyll v3.5.2</generator>
+    
+      <item>
+        <title>File Upload without saving to disk - Part 1</title>
+        <description>&lt;p&gt;File upload seems to be one of those really basic things, but it might not be so clear cut for beginners, especially if 
+the file is not being saved to disk..&lt;/p&gt;
+
+&lt;p&gt;The task is simple. Create a simple file upload application. Receive an image from the user and display that image back to the user.
+The image should &lt;strong&gt;not&lt;/strong&gt; be saved (locally or anywhere).&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/strong&gt; In a live application, images (especially those gotten from &lt;em&gt;users&lt;/em&gt;) should &lt;strong&gt;not&lt;/strong&gt; be saved in the app. A cloud based 
+system like &lt;a href=&quot;https://github.com/boto/boto3&quot;&gt;boto&lt;/a&gt; (which is AWS SDK for python) or &lt;a href=&quot;https://github.com/cloudinary/pycloudinary&quot;&gt;cloudinary&lt;/a&gt; 
+should be used.&lt;/p&gt;
+
+&lt;p&gt;So, let’s get to work.&lt;/p&gt;
+
+&lt;p&gt;In flask’s &lt;a href=&quot;http://flask.pocoo.org/docs/0.12/patterns/fileuploads/&quot;&gt;documentation&lt;/a&gt; (shown below), we see how we can upload a file to a folder. 
+We shall build upon this example.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;import os
+from flask import Flask, request, redirect, url_for
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = '/path/to/the/uploads'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('uploaded_file',
+                                    filename=filename))
+    return '''
+    &amp;lt;!doctype html&amp;gt;
+    &amp;lt;title&amp;gt;Upload new File&amp;lt;/title&amp;gt;
+    &amp;lt;h1&amp;gt;Upload new File&amp;lt;/h1&amp;gt;
+    &amp;lt;form method=post enctype=multipart/form-data&amp;gt;
+      &amp;lt;p&amp;gt;&amp;lt;input type=file name=file&amp;gt;
+         &amp;lt;input type=submit value=Upload&amp;gt;
+    &amp;lt;/form&amp;gt;
+    '''
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;First, we have an &lt;code&gt;allowed_file&lt;/code&gt; function that takes in a filename, checks if that filename is valid and returns a boolean; 
+True if valid and False otherwise.&lt;/p&gt;
+
+&lt;p&gt;Next we have an &lt;code&gt;upload_file&lt;/code&gt; function which we shall be editing. This function simply runs some checks on a file to 
+ensure a valid file is uploaded.&lt;/p&gt;
+
+&lt;p&gt;If a file is uploaded and the filename is valid, i.e.&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;...
+if file and allowed_file(file.name):
+    # Save file in-memory
+    file_obj = BytesIO()
+    file.save(file_obj)
+
+    # Head back to the beginning of the file
+    file_obj.seek(0)
+
+    return send_file(file_obj, mimetype=file.content_type)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code&gt;file_obj = BytesIO()&lt;/code&gt; - Create a &lt;a href=&quot;https://docs.python.org/3/library/io.html#io.BytesIO&quot;&gt;BytesIO&lt;/a&gt; object&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;file.save(file_obj)&lt;/code&gt; - Call the &lt;a href=&quot;http://werkzeug.pocoo.org/docs/0.14/datastructures/#werkzeug.datastructures.FileStorage.save&quot;&gt;save&lt;/a&gt; 
+method on &lt;code&gt;file&lt;/code&gt;, passing in the BytesIO object we created earlier as a parameter (the destination or dst). This saves 
+the file to a destination, in our case the file object.&lt;/li&gt;
+  &lt;li&gt;&lt;code&gt;file_obj.seek(0)&lt;/code&gt; - &lt;a href=&quot;https://docs.python.org/3/library/io.html#io.IOBase.seek&quot;&gt;Seek&lt;/a&gt; back to the offset (in our case, 
+the beginning of the file). This makes sure that the file pointer is positioned at the start of data to send. Omitting 
+this could result in an empty bytes object.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Finally, we send the content of the file object to the client using Flasks &lt;a href=&quot;http://flask.pocoo.org/docs/0.12/api/#flask.send_file&quot;&gt;&lt;code&gt;send_file&lt;/code&gt;&lt;/a&gt;. 
+&lt;code&gt;Send_file&lt;/code&gt; takes in the filename or file object as the first argument, followed by other optional arguments.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;If we pass in a filepath, the mimetype is automatically detected; Else an error would be thrown. Since we are passing in 
+the file object, we need to also specify the mimetype.&lt;/li&gt;
+  &lt;li&gt;File names should &lt;strong&gt;never&lt;/strong&gt; be passed to &lt;code&gt;send_file&lt;/code&gt; from user sources. &lt;a href=&quot;http://flask.pocoo.org/docs/0.12/api/#flask.send_from_directory&quot;&gt;&lt;code&gt;Send_from_directory&lt;/code&gt;&lt;/a&gt; 
+should be used instead.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;After removing unused imports and their implementations, the final code looks like this:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-python&quot;&gt;from flask import Flask, request, redirect, flash, send_file
+from io import BytesIO
+
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+app = Flask(__name__)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        print('Post method')
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            # Save file in-memory
+            file_obj = BytesIO()
+            file.save(file_obj)
+
+            # Head back to the beginning of the file
+            file_obj.seek(0)
+
+            return send_file(file_obj, mimetype=file.content_type)
+    return '''
+    &amp;lt;!doctype html&amp;gt;
+    &amp;lt;title&amp;gt;Upload new File&amp;lt;/title&amp;gt;
+    &amp;lt;h1&amp;gt;Upload new File&amp;lt;/h1&amp;gt;
+    &amp;lt;form method=post enctype=multipart/form-data&amp;gt;
+      &amp;lt;p&amp;gt;&amp;lt;input type=file name=file&amp;gt;
+         &amp;lt;input type=submit value=Upload&amp;gt;
+    &amp;lt;/form&amp;gt;
+    '''
+
+
+if __name__ == &quot;__main__&quot;:
+    app.run()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In part 2, we would look at testing the application. That’s all folks!&lt;/p&gt;
+</description>
+        <pubDate>Sat, 23 Dec 2017 17:18:01 +0100</pubDate>
+        <link>https://iamlordaubrey.github.io/techie/2017/12/23/file-upload-without-saving-to-disk.html</link>
+        <guid isPermaLink="true">https://iamlordaubrey.github.io/techie/2017/12/23/file-upload-without-saving-to-disk.html</guid>
+        
+        
+        <category>techie</category>
+        
+      </item>
+    
+      <item>
+        <title>Blogging with Jekyll!</title>
+        <description>&lt;p&gt;I just finished setting up my blog. It’s still very much green, as am I, still I decided to begin my ramblings.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;what-is-github-pages&quot;&gt;What is GitHub Pages?&lt;/h4&gt;
+&lt;p&gt;GitHub Pages is a static site hosting service, &lt;a href=&quot;https://help.github.com/articles/what-is-github-pages/&quot;&gt;so they say&lt;/a&gt;. The idea is basically to have a static site hosted by GitHub Pages from a GitHub repository. The emphasis here is on &lt;strong&gt;static site&lt;/strong&gt;. It doesn’t support &lt;em&gt;server side&lt;/em&gt; code.&lt;/p&gt;
+
+&lt;p&gt;You might want to take a look at the &lt;a href=&quot;https://help.github.com/articles/github-terms-of-service/&quot;&gt;terms of service&lt;/a&gt; and &lt;a href=&quot;https://help.github.com/articles/github-community-guidelines/&quot;&gt;community guidelines&lt;/a&gt;, just so everyone’s clear.&lt;/p&gt;
+
+&lt;p&gt;&lt;del&gt;Dr.&lt;/del&gt; Jekyll powers GitHub Pages. Jekyll is a simple, blog-aware, static site generator. They &lt;a href=&quot;https://jekyllrb.com/docs/home/#so-what-is-jekyll-exactly&quot;&gt;did a better job&lt;/a&gt; at explaining it than I would, so I’ll leave it at that.&lt;/p&gt;
+
+&lt;p&gt;We are going to set up our GitHub blog to run locally, then push it to GitHub.&lt;/p&gt;
+
+&lt;p&gt;Assumptions:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;You know about and have used GitHub before; which would imply&lt;/li&gt;
+  &lt;li&gt;You’re comfy with the terminal&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Ok, shall we begin…&lt;/p&gt;
+
+&lt;p&gt;Note: Comments begin with the hash tag (#…)&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&quot;run-github-blog-locally&quot;&gt;Run GitHub blog locally:&lt;/h4&gt;
+
+&lt;p&gt;In your terminal;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Install Jekyll and Bundler gems via RubyGems:&lt;/em&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;gem install jekyll bundler
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Create a new Jekyll site at ./name_of_blog. This location would be the root directory of your blog:&lt;/em&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;jekyll new name_of_blog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Change into your new directory:&lt;/em&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;cd name_of_blog
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Next, edit your Gemfile. Within &lt;code&gt;name_of_blog&lt;/code&gt; directory is a file called Gemfile. Open it with your favorite editor;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Remove or comment Jekyll gem:&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Comment jekyll gem
+# gem &quot;jekyll&quot;, &quot;3.4.1&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;Delete the &lt;code&gt;#&lt;/code&gt; at the beginning of this line:&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;gem &quot;github-pages&quot;, group: :jekyll_plugins
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the terminal, update bundle and run the server`:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Rebuild snapshot
+bundle update
+
+# Run the site locally
+jekyll serve
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now go to http://localhost:4000. The site should be running locally at that address.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h4 id=&quot;push-the-site-to-github&quot;&gt;Push the site to GitHub:&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Initialize your site directory as a Git repository
+git init
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point, we assume we have created a spanking new repository on GitHub. If we haven’t, here’s how to &lt;a href=&quot;https://help.github.com/articles/create-a-repo/&quot;&gt;create a repo&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Connect your remote repository on GitHub to your local repository
+git remote add origin https://github.com/username-or-organization-name/your-remote-repository-name.git
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;One can make certain edits at this stage. Some edits might include:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Editing the blog title / email / description / etc in the &lt;code&gt;_config.yml&lt;/code&gt; file&lt;/li&gt;
+  &lt;li&gt;Creating a README.md file&lt;/li&gt;
+  &lt;li&gt;Etc&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Add or stage your changes
+git add -p
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;-p&lt;/code&gt; flag steps through your changes, allowing you see what was changed and giving you the option to accept or reject that change.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Commit your changes with a comment
+~/name_of_blog$ git commit -m &quot;Edit or update site&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Push your changes to your remote repository on GitHub. Because this is the first push to the newly created remote branch, we add the upstream tracking reference using the &lt;code&gt;-u&lt;/code&gt; flag.
+After pushing, the local branch is linked to the remote branch, and the commands &lt;code&gt;git pull&lt;/code&gt; or &lt;code&gt;git push&lt;/code&gt; can be used without any arguments.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;# Pushing changes...
+git push -u origin master
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;At this point, all your changes should be in the remote repository. To take our site live,&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Click the “&lt;strong&gt;Settings&lt;/strong&gt;” button at the top right of your repository page (on GitHub)&lt;/li&gt;
+  &lt;li&gt;Scroll to the &lt;strong&gt;GitHub Pages&lt;/strong&gt;, &lt;strong&gt;Source&lt;/strong&gt; section, click on the drop-down list and select &lt;code&gt;master branch&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Click on the &lt;strong&gt;Save&lt;/strong&gt; button to the right of the drop-down list&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;You should see the message:
+&lt;code&gt;Your site is published at https://username.github.io/your-remote-repository-name/&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;If you don’t see this message, please refresh the page and check again.&lt;/p&gt;
+
+&lt;p&gt;Your blog should now be live.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-markdown&quot;&gt;__Note__: As of 5th March 2017, the gem `github-pages` comes with jekyll version 3.3.1
+Changing the theme in the repository's settings page causes the app to break. 
+Removing the includes in the `about.md` page fixes this.
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Wed, 16 Aug 2017 14:09:01 +0100</pubDate>
+        <link>https://iamlordaubrey.github.io/techie/2017/08/16/setting-up-a-blog-with-jekyll.html</link>
+        <guid isPermaLink="true">https://iamlordaubrey.github.io/techie/2017/08/16/setting-up-a-blog-with-jekyll.html</guid>
+        
+        
+        <category>techie</category>
+        
+      </item>
+    
+  </channel>
+</rss>
