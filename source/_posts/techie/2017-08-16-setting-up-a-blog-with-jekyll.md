@@ -27,46 +27,52 @@ Assumptions:
 
 Ok, shall we begin...
 
+Note: Comments begin with the hash tag (#...)
+
 ---
 
 #### Run GitHub blog locally:
 
 In your terminal;
 
+*Install Jekyll and Bundler gems via RubyGems:*
 ```bash
-# Install Jekyll and Bundler gems via RubyGems
-~$ gem install jekyll bundler
+gem install jekyll bundler
+```
 
-# Create a new Jekyll site at ./name_of_blog. This location would be the root directory of your blog
-~$ jekyll new name_of_blog
+*Create a new Jekyll site at ./name_of_blog. This location would be the root directory of your blog:*
+```bash
+jekyll new name_of_blog
+```
 
-# Change into your new directory
-~$ cd name_of_blog
+*Change into your new directory:*
+```bash
+cd name_of_blog
 ```
 
 Next, edit your Gemfile. Within `name_of_blog` directory is a file called Gemfile. Open it with your favorite editor;
 
-Remove or comment Jekyll gem:
+*Remove or comment Jekyll gem:*
 
 ```bash
 # Comment jekyll gem
 # gem "jekyll", "3.4.1"
 ```
 
-Delete the `#` at the beginning of this line:
+*Delete the `#` at the beginning of this line:*
 
 ```bash
 gem "github-pages", group: :jekyll_plugins
 ```
 
-Then update bundle and run the server`:
+Then in the terminal, update bundle and run the server`:
 
 ```bash
 # Rebuild snapshot
-~/name_of_blog$ bundle update
+bundle update
 
 # Run the site locally
-~/name_of_blog$ jekyll serve
+jekyll serve
 ```
 
 Now go to http://localhost:4000. The site should be running locally at that address.
@@ -77,26 +83,26 @@ Now go to http://localhost:4000. The site should be running locally at that addr
 
 ```bash
 # Initialize your site directory as a Git repository
-~/name_of_blog$ git init
+git init
 ```
 
 At this point, we assume we have created a spanking new repository on GitHub. If we haven't, here's how to [create a repo](https://help.github.com/articles/create-a-repo/).
 
 ```bash
 # Connect your remote repository on GitHub to your local repository
-~/name_of_blog$ git remote add origin https://github.com/username-or-organization-name/your-remote-repository-name.git
+git remote add origin https://github.com/username-or-organization-name/your-remote-repository-name.git
 ```
 
 One can make certain edits at this stage. Some edits might include:
 
-* editing the blog title / email / description / etc in the `_config.yml` file
-* creating a README.md file
-* etc
+* Editing the blog title / email / description / etc in the `_config.yml` file
+* Creating a README.md file
+* Etc
 
 
 ```bash
 # Add or stage your changes
-~/name_of_blog$ git add -p
+git add -p
 ```
 
 The `-p` flag steps through your changes, allowing you see what was changed and giving you the option to accept or reject that change.
@@ -111,7 +117,7 @@ After pushing, the local branch is linked to the remote branch, and the commands
 
 ```bash
 # Pushing changes...
-~/name_of_blog$ git push -u origin master
+git push -u origin master
 ```
 
 At this point, all your changes should be in the remote repository. To take our site live,
